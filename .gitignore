@@ -1,0 +1,23 @@
+# STM32CubeIDE build output directories
+Debug/
+Release/
+bin/
+obj/
+
+# Compiler outputs & diagnostics
+*.o
+*.obj
+*.d
+*.su
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+*.axf
+
+# Temporary & OS files
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
