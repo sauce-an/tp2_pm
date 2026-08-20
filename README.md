@@ -1,6 +1,6 @@
 # Smart AC/DC Power Measurement & Telemetry System
 
-A bare-metal embedded firmware application developed on the **STM32** microcontroller (ARM Cortex-M4) for precision AC/DC power monitoring, real-time graphical display management, local SD-card logging, and dual-mode USB/Wi-Fi telemetry streaming.
+A bare-metal embedded firmware application developed on the **STM32L476RET6TR** microcontroller (ARM Cortex-M4 @ 80 MHz, 512 KB Flash, 128 KB SRAM, LQFP-64) for precision AC/DC power monitoring, real-time graphical display management, local SD-card logging, and dual-mode USB/Wi-Fi telemetry streaming.
 
 ---
 
@@ -8,17 +8,17 @@ A bare-metal embedded firmware application developed on the **STM32** microcontr
 
 ```
                          +-------------------------------------------+
-                         |            STM32 Microcontroller           |
-                         |                                             |
-[AC / DC Inputs] ------->| ADC1/2/3 (DMA & Polling Engines)            |
-[Current MUX/Relay] <----| PC0 / RANGE_SELECT (Auto-Ranging)           |
-[Pushbuttons] ----------->| GPIO (PA5-PA7, PB0-PB1) Debounce FSM        |
-[ST7920 128x64 LCD] <----| SPI3 + DMA2 + Timer 1 PWM Backlight         |
-[MicroSD Card] <---------| SPI2 (FatFS Data Logger)                    |
-[Hardware RTC] <--------->| LSE 32.768kHz + Supercap Backup Check       |
-[USB Host / PC] <-------->| USART3 (Direct UART Stream)                 |
-[Seeed Wi-Fi Module] <---| USART3 (Hardware Armor / 0V Clamp)          |
-[Status LED] <-----------| PC4 (100ms Measurement Indicator)           |
+                         |      STM32L476RET6TR (ARM Cortex-M4)      |
+                         |                                           |
+[AC / DC Inputs] ------->| ADC1/2/3 (DMA & Polling Engines)          |
+[Current MUX/Relay] <----| PC0 / RANGE_SELECT (Auto-Ranging)         |
+[Pushbuttons] ----------->| GPIO (PA5-PA7, PB0-PB1) Debounce FSM      |
+[ST7920 128x64 LCD] <----| SPI3 + DMA2 + Timer 1 PWM Backlight       |
+[MicroSD Card] <---------| SPI2 (FatFS Data Logger)                  |
+[Hardware RTC] <--------->| LSE 32.768kHz + Supercap Backup Check     |
+[USB Host / PC] <-------->| USART3 (Direct UART Stream)               |
+[Seeed Wi-Fi Module] <---| USART3 (Hardware Armor / 0V Clamp)        |
+[Status LED] <-----------| PC4 (100ms Measurement Indicator)         |
                          +-------------------------------------------+
 ```
 
@@ -110,6 +110,25 @@ T<DD><MM><YYYY><HH><MM><SS>\0
 
 ---
 
+## Hardware Architecture & Schematics
+
+Hardware design files, PCB schematics, and simulation models are organized in the [`Hardware/`](file:///Hardware/) directory:
+
+- **PCB Schematics ([`Hardware/Schematics/`](file:///Hardware/Schematics/)):**
+  - [`ENGG3800_PCB_V2_schemetic.pdf`](file:///Hardware/Schematics/ENGG3800_PCB_V2_schemetic.pdf) — Production Revision V2 PCB Schematic with integrated AC auto-ranging, DC sensing, ST7920 display, and telemetry isolation circuits.
+  - [`ENGG3800_PCB_V1_schemetic.pdf`](file:///Hardware/Schematics/ENGG3800_PCB_V1_schemetic.pdf) — Revision V1 PCB Schematic.
+  - [`ENGG3800 schemetic for seminar.pdf`](file:///Hardware/Schematics/ENGG3800%20schemetic%20for%20seminar.pdf) — Presentation and seminar hardware schematic.
+- **System Specifications ([`Hardware/Specifications/`](file:///Hardware/Specifications/)):**
+  - [`power_meter_spec_V2.pdf`](file:///Hardware/Specifications/power_meter_spec_V2.pdf) — Complete hardware specifications, measurement tolerances, and voltage/current input limits.
+  - [`power_meter_spec.pdf`](file:///Hardware/Specifications/power_meter_spec.pdf) — Initial specification document.
+  - [`ENGG3800_2026s1_demo1_criteria_sheet.pdf`](file:///Hardware/Specifications/ENGG3800_2026s1_demo1_criteria_sheet.pdf) — Project evaluation and demonstration criteria.
+- **Analog Circuit Simulation ([`Hardware/Simulation/`](file:///Hardware/Simulation/)):**
+  - [`AC Signal Measuring/`](file:///Hardware/Simulation/AC%20Signal%20Measuring/) — LTspice simulation models (`.asc`, `.raw`) for front-end AC voltage and current conditioning circuits.
+- **UI State Machine Diagram ([`Hardware/Diagrams/`](file:///Hardware/Diagrams/)):**
+  - [`TP2-seminar LCD FSM.drawio.png`](file:///Hardware/Diagrams/TP2-seminar%20LCD%20FSM.drawio.png) — Visual Finite State Machine diagram for LCD navigation.
+
+---
+
 ## Firmware Architecture
 
 ```
@@ -138,6 +157,12 @@ Core/
     ├── saveNV.c           # Flash memory read/write persistence routines
     ├── sd_comm.c          # FatFS SD-card stream logger implementation
     └── wifi.c             # Wi-Fi module telemetry interface
+
+Hardware/
+├── Schematics/            # PCB Revision V1, V2, and seminar schematics (PDF)
+├── Specifications/        # Power meter specifications & demonstration criteria
+├── Simulation/            # LTspice front-end circuit simulation models
+└── Diagrams/              # LCD Finite State Machine flowcharts
 ```
 
 ---
@@ -145,6 +170,7 @@ Core/
 ## Build & Flash Instructions
 
 ### Prerequisites
+- **Target MCU:** **STM32L476RET6TR** (ARM Cortex-M4 @ 80 MHz, 512 KB Flash, 128 KB SRAM, LQFP-64)
 - **IDE / Toolchain:** [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) (Version 1.14.0 or newer)
 - **Compiler:** `arm-none-eabi-gcc` (C99 standard enabled)
 - **Hardware Debugger:** ST-Link V2 / V3 with SWD interface (SWDIO, SWCLK, GND)
@@ -162,7 +188,7 @@ Core/
 ### Flashing to Target
 
 1. Connect the ST-Link programmer to the target SWD header (ensure PA13/PA14 and Ground are connected).
-2. Click **Run > Debug** (`F11`) to flash the `.elf` binary to the STM32 internal Flash.
+2. Click **Run > Debug** (`F11`) to flash the `.elf` binary to the **STM32L476RET6TR** internal Flash.
 3. Resume execution (`F8`) to begin runtime operation.
 
 ---
